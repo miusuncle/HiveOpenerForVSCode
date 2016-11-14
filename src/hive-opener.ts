@@ -4,8 +4,6 @@ import * as paths from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-const CONFIG_FILE = 'hive-opener.json';
-
 /** 显示打开项列表 */
 export function showOpenList() {
     vscode.window.showInformationMessage('showOpenList');
@@ -40,20 +38,26 @@ export function openConfigFile() {
 
 /** 获取配置文件路径 */
 function getConfigFilePath() {
-    let configFile;
+    let result;
 
     const configFileLocation = vscode.workspace.getConfiguration('hiveOpener').get('configFileLocation');
     if (configFileLocation !== '') {
-        configFile = paths.join(configFileLocation, CONFIG_FILE);
+        result = paths.join(configFileLocation, getConfigFileName());
     } else {
         const appData = process.env.APPDATA;
         const channelPath = getChannelPath();
-        configFile = paths.join(appData, channelPath, 'User', CONFIG_FILE);
+        result = paths.join(appData, channelPath, 'User', getConfigFileName());
     }
 
-    return configFile;
+    return result;
 }
 
+/** 获取配置文件名 */
+function getConfigFileName() {
+    return vscode.workspace.getConfiguration('hiveOpener').get('configFileName');
+}
+
+/** 获取 VSCode 对应 Channel 配置路径 */
 function getChannelPath() {
     if (!!~vscode.env.appName.indexOf('Insiders')) {
         return 'Code - Insiders';

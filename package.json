@@ -35,6 +35,11 @@
             "type": "object",
             "title": "Hive Opener Configuration",
             "properties": {
+                "hiveOpener.configFileName": {
+                    "type": "string",
+                    "default": "hive-opener.json",
+                    "description": "Indicates an alternative config file name"
+                },
                 "hiveOpener.configFileLocation": {
                     "type": "string",
                     "default": "",
