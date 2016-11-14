@@ -6,7 +6,7 @@ import * as hiveOpener from './hive-opener';
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('hiveOpener.showOpenList', () => {
-            hiveOpener.showOpenList();
+            hiveOpener.showOpenList(['files', 'dirs', 'urls']);
         }),
 
         vscode.commands.registerCommand('hiveOpener.manageOpenList', () => {

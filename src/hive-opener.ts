@@ -2,11 +2,44 @@
 
 import * as paths from 'path';
 import * as fs from 'fs';
+import * as _ from 'lodash';
 import * as vscode from 'vscode';
+import * as util from './util';
+
+type ItemTypes = 'files' | 'dirs' | 'urls';
 
 /** 显示打开项列表 */
-export function showOpenList() {
-    vscode.window.showInformationMessage('showOpenList');
+export function showOpenList(filters:ItemTypes[] = ['files', 'dirs', 'urls']) {
+    const configFile = getConfigFilePath();
+
+    if (!fs.existsSync(configFile)) {
+        vscode.window.showInformationMessage('No open item created yet!');
+        return;
+    }
+
+    const openItems = loadOpenItems(configFile, filters);
+    const quickPickItems = mapItemPairsToQuickPickItems(openItems) as vscode.QuickPickItem[];
+
+    // current operating item
+    let target: string;
+
+    vscode.window.showQuickPick(quickPickItems, {
+        ignoreFocusOut: false,
+        matchOnDescription: false,
+        placeHolder: 'Please select an item to open',
+    })
+    .then(item => {
+        if (item) {
+            target = item.description;
+            return openItem(target);
+        }
+    })
+    .then(result => {
+        if (result === false) {
+            // TODO: remove item from open list
+            console.log('Item to be removed:', target);
+        }
+    });
 }
 
 /** 管理打开项列表 */
@@ -62,9 +95,52 @@ function getConfigFileName() {
 
 /** 获取 VSCode 对应 Channel 配置路径 */
 function getChannelPath() {
-    if (!!~vscode.env.appName.indexOf('Insiders')) {
+    if (vscode.env.appName.indexOf('Insiders') > 0) {
         return 'Code - Insiders';
     }
 
     return 'Code';
+}
+
+function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
+    return itemPairs.map(([description, label]) => {
+        let detail = `[${util.getItemType(description)}] ${description}`;
+        return { label, description, detail };
+    });
+}
+
+function loadOpenItems(filePath: string, filters: ItemTypes[]) {
+    try {
+        const items = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        return _(items).pick(filters).values().flatten().value() as [string, string][];
+
+    } catch (err) {
+        const message = `Error loading \`${getConfigFileName()}\` file. Message: ${err.toString()}`;
+        const items = { title: 'Open File' };
+
+        vscode.window.showErrorMessage(message, items).then(option => {
+            if (option && option.title === 'Open File') {
+                vscode.commands.executeCommand('hiveOpener.openConfigFile');
+            }
+        });
+    }
+}
+
+function openItem(target: string) {
+    switch (true) {
+    case util.isUrl(target):
+        util.openUrl(target);
+        break;
+
+    case util.isFile(target):
+        util.openFile(target);
+        break;
+
+    case util.isDirectory(target):
+        util.openDirectory(target);
+        break;
+
+    default:
+        return false;
+    }
 }
