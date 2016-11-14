@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import * as util from './util';
+import getSupportActions from './support-actions';
 
 type ItemTypes = 'files' | 'dirs' | 'urls';
 
@@ -12,7 +13,7 @@ type ItemTypes = 'files' | 'dirs' | 'urls';
 export function showOpenList(filters:ItemTypes[] = ['files', 'dirs', 'urls']) {
     const configFile = getConfigFilePath();
 
-    if (!fs.existsSync(configFile)) {
+    if (!util.isFile(configFile)) {
         vscode.window.showInformationMessage('No open item created yet!');
         return;
     }
@@ -45,7 +46,35 @@ export function showOpenList(filters:ItemTypes[] = ['files', 'dirs', 'urls']) {
 
 /** 管理打开项列表 */
 export function manageOpenList() {
-    vscode.window.showInformationMessage('manageOpenList');
+    const actions = getSupportActions();
+
+    if (hasOpenItems()) {
+        _.each(actions, item => {
+            if (_.includes(['edit', 'remove'], item.type)) {
+                item.active = true;
+            }
+        });
+    }
+
+    const items = _(actions).filter('active').map('label').value() as string[];
+
+    vscode.window.showQuickPick(items).then(label => {
+        const action = _.find(actions, { label });
+
+        switch (action.type) {
+        case 'add':
+            addItemToOpenList();
+            break;
+
+        case 'edit':
+            editItemFromOpenList();
+            break;
+
+        case 'remove':
+            removeItemFromOpenList();
+            break;
+        }
+    });
 }
 
 /** 打开配置文件 */
@@ -116,8 +145,8 @@ function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
 
 function loadOpenItems(filePath: string, filters: ItemTypes[]) {
     try {
-        const items = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        return _(items).pick(filters).values().flatten().value() as [string, string][];
+        const config = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        return _(config).pick(filters).values().flatten().value() as [string, string][];
 
     } catch (err) {
         const message = `Error loading \`${getConfigFileName()}\` file. Message: ${err.toString()}`;
@@ -128,6 +157,8 @@ function loadOpenItems(filePath: string, filters: ItemTypes[]) {
                 vscode.commands.executeCommand('hiveOpener.openConfigFile');
             }
         });
+
+        throw err;
     }
 }
 
@@ -148,4 +179,46 @@ function openItem(target: string) {
     default:
         return false;
     }
+}
+
+function hasOpenItems() {
+    const configFile = getConfigFilePath();
+
+    if (!util.isFile(configFile)) {
+        return false;
+    }
+
+    try {
+        const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+
+        return !!(false
+            || _.get(config, 'files', []).length
+            || _.get(config, 'dirs', []).length
+            || _.get(config, 'urls', []).length
+        );
+
+    } catch (err) {
+        const message = `Error loading \`${getConfigFileName()}\` file. Message: ${err.toString()}`;
+        const items = { title: 'Open File' };
+
+        vscode.window.showErrorMessage(message, items).then(option => {
+            if (option && option.title === 'Open File') {
+                vscode.commands.executeCommand('hiveOpener.openConfigFile');
+            }
+        });
+
+        throw err;
+    }
+}
+
+function addItemToOpenList() {
+    // TODO: add logic here
+}
+
+function editItemFromOpenList() {
+    // TODO: add logic here
+}
+
+function removeItemFromOpenList() {
+    // TODO: add logic here
 }
