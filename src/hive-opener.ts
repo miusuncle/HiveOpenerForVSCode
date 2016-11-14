@@ -20,7 +20,10 @@ export function openConfigFile() {
 
     if (fs.existsSync(configFile)) {
         vscode.workspace.openTextDocument(configFile).then(doc => {
-            vscode.window.showTextDocument(doc);
+            const activeEditor = vscode.window.activeTextEditor;
+            const column = activeEditor && activeEditor.viewColumn || 1;
+
+            vscode.window.showTextDocument(doc, column);
         });
 
     } else {
