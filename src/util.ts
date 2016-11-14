@@ -1,3 +1,5 @@
+'use strict';
+
 import * as fs from 'fs';
 import * as paths from 'path';
 import * as validUrl from 'valid-url';
@@ -45,7 +47,7 @@ export function getItemType(target: string) {
 
 export function openFile(target: string) {
     if (isBinaryFile.sync(target)) {
-        open(target);
+        childProcess.exec(`explorer "${target}"`);
 
     } else {
         vscode.workspace.openTextDocument(target).then(doc => {

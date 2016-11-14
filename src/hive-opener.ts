@@ -25,12 +25,13 @@ export function showOpenList(filters:ItemTypes[] = ['files', 'dirs', 'urls']) {
 
     vscode.window.showQuickPick(quickPickItems, {
         ignoreFocusOut: false,
-        matchOnDescription: false,
+        matchOnDescription: true,
+        matchOnDetail: false,
         placeHolder: 'Please select an item to open',
     })
     .then(item => {
         if (item) {
-            target = item.description;
+            target = item.detail;
             return openItem(target);
         }
     })
@@ -98,14 +99,14 @@ function getChannelPath() {
 }
 
 function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
-    return itemPairs.map(([description, label]) => {
-        let detail = `[${util.getItemType(description)}] ${description}`;
+    return itemPairs.map(([detail, label]) => {
+        let description = `[${util.getItemType(detail)}]`;
 
         if (!label) {
-            if (util.isFile(description)) {
-                label = paths.basename(description);
+            if (util.isFile(detail)) {
+                label = paths.basename(detail);
             } else {
-                label = description;
+                label = detail;
             }
         }
 
