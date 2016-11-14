@@ -7,7 +7,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('hiveOpener.showOpenList', () => {
             hiveOpener.showOpenList();
-
         }),
 
         vscode.commands.registerCommand('hiveOpener.manageOpenList', () => {
@@ -21,4 +20,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
+    // do nothing
 }
