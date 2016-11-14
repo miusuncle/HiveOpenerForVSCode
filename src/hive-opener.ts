@@ -52,12 +52,7 @@ export function openConfigFile() {
     const configFile = getConfigFilePath();
 
     if (fs.existsSync(configFile)) {
-        vscode.workspace.openTextDocument(configFile).then(doc => {
-            const activeEditor = vscode.window.activeTextEditor;
-            const column = activeEditor && activeEditor.viewColumn || 1;
-
-            vscode.window.showTextDocument(doc, column);
-        });
+        util.openFile(configFile);
 
     } else {
         const message = 'No config file created yet! Do you want to create it right now?';
