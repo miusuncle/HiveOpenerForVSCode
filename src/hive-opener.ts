@@ -100,6 +100,15 @@ function getChannelPath() {
 function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
     return itemPairs.map(([description, label]) => {
         let detail = `[${util.getItemType(description)}] ${description}`;
+
+        if (!label) {
+            if (util.isFile(description)) {
+                label = paths.basename(description);
+            } else {
+                label = description;
+            }
+        }
+
         return { label, description, detail };
     });
 }
