@@ -11,24 +11,39 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:hiveOpener.showOpenList",
-        "onCommand:hiveOpener.manageOpenList",
-        "onCommand:hiveOpener.openConfigFile"
+        "onCommand:hiveOpener.showOpenerList",
+        "onCommand:hiveOpener.manageOpenerList",
+        "onCommand:hiveOpener.openConfigFile",
+        "onCommand:hiveOpener.addItemToOpenerList",
+        "onCommand:hiveOpener.editItemFromOpenerList",
+        "onCommand:hiveOpener.removeItemFromOpenerList"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "commands": [
             {
-                "command": "hiveOpener.showOpenList",
+                "command": "hiveOpener.showOpenerList",
                 "title": "Hive Opener: Show Open List"
             },
             {
-                "command": "hiveOpener.manageOpenList",
+                "command": "hiveOpener.manageOpenerList",
                 "title": "Hive Opener: Manage Open List"
             },
             {
                 "command": "hiveOpener.openConfigFile",
                 "title": "Hive Opener: Open Config File"
+            },
+            {
+                "command": "hiveOpener.addItemToOpenerList",
+                "title": "Hive Opener: Add Item to Open List"
+            },
+            {
+                "command": "hiveOpener.editItemFromOpenerList",
+                "title": "Hive Opener: Edit Item from Open List"
+            },
+            {
+                "command": "hiveOpener.removeItemFromOpenerList",
+                "title": "Hive Opener: Remove Item from Open List"
             }
         ],
         "configuration": {
@@ -49,11 +64,11 @@
         },
         "keybindings": [
             {
-                "command": "hiveOpener.showOpenList",
+                "command": "hiveOpener.showOpenerList",
                 "key": "alt+ctrl+o"
             },
             {
-                "command": "hiveOpener.manageOpenList",
+                "command": "hiveOpener.manageOpenerList",
                 "key": "alt+ctrl+i"
             },
             {

@@ -3,16 +3,28 @@ import * as controller from './controller';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('hiveOpener.showOpenList', () => {
+        vscode.commands.registerCommand('hiveOpener.showOpenerList', () => {
             controller.showOpenerList(['files', 'dirs', 'urls']);
         }),
 
-        vscode.commands.registerCommand('hiveOpener.manageOpenList', () => {
+        vscode.commands.registerCommand('hiveOpener.manageOpenerList', () => {
             controller.manageOpenerList();
         }),
 
         vscode.commands.registerCommand('hiveOpener.openConfigFile', () => {
             controller.openConfigFile();
+        }),
+
+        vscode.commands.registerCommand('hiveOpener.addItemToOpenerList', () => {
+            controller.addItemToOpenerList();
+        }),
+
+        vscode.commands.registerCommand('hiveOpener.editItemFromOpenerList', () => {
+            controller.editItemFromOpenerList();
+        }),
+
+        vscode.commands.registerCommand('hiveOpener.removeItemFromOpenerList', () => {
+            controller.removeItemFromOpenerList();
         }),
     );
 }
