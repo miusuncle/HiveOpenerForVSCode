@@ -1,5 +1,3 @@
-'use strict';
-
 import * as paths from 'path';
 import * as validator from './validator';
 

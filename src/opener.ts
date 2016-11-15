@@ -1,5 +1,3 @@
-'use strict';
-
 import * as childProcess from 'child_process';
 import * as validator from './validator';
 import * as vscode from 'vscode';
