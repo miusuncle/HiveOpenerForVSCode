@@ -1,20 +1,20 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import * as hiveOpener from './hive-opener';
+import * as controller from './controller';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('hiveOpener.showOpenList', () => {
-            hiveOpener.showOpenList(['files', 'dirs', 'urls']);
+            controller.showOpenList(['files', 'dirs', 'urls']);
         }),
 
         vscode.commands.registerCommand('hiveOpener.manageOpenList', () => {
-            hiveOpener.manageOpenList();
+            controller.manageOpenList();
         }),
 
         vscode.commands.registerCommand('hiveOpener.openConfigFile', () => {
-            hiveOpener.openConfigFile();
+            controller.openConfigFile();
         }),
     );
 }

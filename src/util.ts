@@ -1,67 +1,36 @@
 'use strict';
 
-import * as fs from 'fs';
 import * as paths from 'path';
-import * as validUrl from 'valid-url';
-import * as childProcess from 'child_process';
-import * as vscode from 'vscode';
-
-const isBinaryFile = require('isbinaryfile');
-const open = require('open');
-
-export function isFile(target: string) {
-    try {
-        return fs.lstatSync(target).isFile();
-    } catch (e) {
-        return false;
-    }
-}
-
-export function isDirectory(target: string) {
-    try {
-        return fs.lstatSync(target).isDirectory();
-    } catch (e) {
-        return false;
-    }
-}
-
-export function isUrl(target: string) {
-    return !!validUrl.isWebUri(target);
-}
+import * as validator from './validator';
 
 export function getItemType(target: string) {
-    if (isUrl(target)) {
+    if (validator.isUrl(target)) {
         return 'URL';
     }
 
-    if (isDirectory(target)) {
+    if (validator.isDirectory(target)) {
         return 'DIR';
     }
 
-    if (isFile(target)) {
+    if (validator.isFile(target)) {
         return paths.extname(target).slice(1).toUpperCase() || 'FILE';
     }
 
     return 'UNKNOWN';
 }
 
-export function openFile(target: string) {
-    if (isBinaryFile.sync(target)) {
-        childProcess.exec(`explorer "${target}"`);
+export function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
+    return itemPairs.map(([detail, label]) => {
+        let description = `[${getItemType(detail)}]`;
 
-    } else {
-        vscode.workspace.openTextDocument(target).then(doc => {
-            const activeEditor = vscode.window.activeTextEditor;
-            const column = activeEditor && activeEditor.viewColumn || 1;
-            vscode.window.showTextDocument(doc, column);
-        });
-    }
-}
+        if (!label) {
+            if (validator.isFile(detail)) {
+                label = paths.basename(detail);
+            } else {
+                label = detail;
+            }
+        }
 
-export function openDirectory(target: string) {
-    childProcess.exec(`start "" "${target}"`);
-}
-
-export function openUrl(target: string) {
-    open(target);
+        return { label, description, detail };
+    });
 }
