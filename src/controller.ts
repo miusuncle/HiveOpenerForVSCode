@@ -28,8 +28,12 @@ export async function showOpenerList(filters?: OpenerItemTypeList) {
     const target = picked.detail;
 
     if (opener.open(target) === false) {
-        // TODO: remove item from open list
-        console.log('Item to be removed:', target);
+        // remove item from open list
+        util.removeOpenerItemFromOpenerItemMapping(target, openerItemMapping);
+        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+        // show drop message
+        vscode.window.showWarningMessage(`Unrecognized item: \`${target}\`, drop it anyway from config file!`);
     }
 }
 
