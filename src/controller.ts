@@ -4,29 +4,23 @@ import * as util from './util';
 import * as opener from './opener';
 import configManager from './config-manager';
 import getSupportActions from './support-actions';
-import { ItemTypes } from './types';
+import { OpenerItemTypeList, OpenerItemList, OpenerItemMapping } from './types';
 
 /** 显示打开项列表 */
-export function showOpenList(filters:ItemTypes[]) {
-    configManager.ensureConfigFileCreated();
+export function showOpenerList(filters?: OpenerItemTypeList) {
+    const openerItemMapping = configManager.loadOpenerItemMappingFromFile(filters);
 
-    const configFilePath = configManager.configFilePath;
-    const openItems = configManager.loadConfigItems(filters);
-
-    if (typeof openItems === 'string') {
-        showLoadingFileErrorMessage(openItems);
+    if (typeof openerItemMapping === 'string') {
+        showLoadingFileErrorMessage(openerItemMapping);
         return;
     }
-
-    const quickPickItems = util.mapItemPairsToQuickPickItems(openItems) as vscode.QuickPickItem[];
 
     // current operating item
     let target: string;
 
-    vscode.window.showQuickPick(quickPickItems, {
-        ignoreFocusOut: false,
-        matchOnDescription: true,
-        matchOnDetail: false,
+    const openerItemList = util.convertOpenerItemMappingToOpenerItemList(openerItemMapping);
+
+    showQuickPickForOpenerItemList(openerItemList, {
         placeHolder: 'Please select an item to open',
     })
     .then(item => {
@@ -44,11 +38,9 @@ export function showOpenList(filters:ItemTypes[]) {
 }
 
 /** 管理打开项列表 */
-export function manageOpenList() {
-    configManager.ensureConfigFileCreated();
-
+export function manageOpenerList() {
     const actions = getSupportActions();
-    const result = configManager.hasConfigItems();
+    const result = configManager.hasOpenerItem();
 
     if (typeof result === 'string') {
         showLoadingFileErrorMessage(result);
@@ -70,15 +62,15 @@ export function manageOpenList() {
 
         switch (action.type) {
         case 'add':
-            addItemToOpenList();
+            addItemToOpenerList();
             break;
 
         case 'edit':
-            editItemFromOpenList();
+            editItemFromOpenerList();
             break;
 
         case 'remove':
-            removeItemFromOpenList();
+            removeItemFromOpenerList();
             break;
         }
     });
@@ -90,16 +82,28 @@ export function openConfigFile() {
     opener.openFile(configManager.configFilePath);
 }
 
-export function addItemToOpenList() {
+export function addItemToOpenerList() {
     vscode.window.showInformationMessage('TODO: addItemToOpenList');
 }
 
-export function editItemFromOpenList() {
+export function editItemFromOpenerList() {
     vscode.window.showInformationMessage('TODO: editItemFromOpenList');
 }
 
-export function removeItemFromOpenList() {
+export function removeItemFromOpenerList() {
     vscode.window.showInformationMessage('TODO: removeItemFromOpenList');
+}
+
+function showQuickPickForOpenerItemList(openerItemList: OpenerItemList, options?: vscode.QuickPickOptions) {
+    const quickPickItems = util.convertOpenerItemListToQuickPickItems(openerItemList) as vscode.QuickPickItem[];
+
+    const quickPickOptions = Object.assign({
+        ignoreFocusOut: false,
+        matchOnDescription: true,
+        matchOnDetail1: false,
+    }, options) as vscode.QuickPickOptions;
+
+    return vscode.window.showQuickPick(quickPickItems, quickPickOptions);
 }
 
 function showLoadingFileErrorMessage(err) {

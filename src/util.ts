@@ -1,5 +1,7 @@
 import * as paths from 'path';
+import * as _ from 'lodash';
 import * as validator from './validator';
+import { OpenerItemList, OpenerItemMapping } from './types';
 
 export function getItemType(target: string) {
     if (validator.isUrl(target)) {
@@ -17,8 +19,12 @@ export function getItemType(target: string) {
     return 'UNKNOWN';
 }
 
-export function mapItemPairsToQuickPickItems(itemPairs: [string, string][]) {
-    return itemPairs.map(([detail, label]) => {
+export function convertOpenerItemMappingToOpenerItemList(openerItemMapping: OpenerItemMapping): OpenerItemList {
+    return _(openerItemMapping).values().flatten().value() as OpenerItemList;
+}
+
+export function convertOpenerItemListToQuickPickItems(openerItemList: OpenerItemList) {
+    return openerItemList.map(([detail, label]) => {
         let description = `[${getItemType(detail)}]`;
 
         if (!label) {

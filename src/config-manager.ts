@@ -3,22 +3,35 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import * as validator from './validator';
-import { ItemTypes } from './types';
+import { OpenerItemTypeList, OpenerItemMapping } from './types';
 
 class ConfigManager {
 	/**
-	 * 确保配置文件已创建
+	 * 加载打开配置项
 	 */
-	ensureConfigFileCreated() {
-		if (!validator.isFile(this.configFilePath)) {
-			this.createConfigFile();
+	loadOpenerItemMappingFromFile(filters: OpenerItemTypeList = ['files', 'dirs', 'urls']): OpenerItemMapping | string {
+		this.ensureConfigFileCreated();
+
+		try {
+			return JSON.parse(fs.readFileSync(this.configFilePath, 'utf8'));
+		} catch (err) {
+			return err.toString();
 		}
 	}
 
 	/**
-	 * 配置文件中是否添加有配置项
+	 * 保存打开配置项
 	 */
-	hasConfigItems(): boolean | string {
+	saveOpenerItemMappingToFile(openerItemMapping: OpenerItemMapping) {
+		fs.writeFileSync(this.configFilePath, JSON.stringify(openerItemMapping, null, '\t'));
+	}
+
+	/**
+	 * 配置文件中是否添加有打开配置项
+	 */
+	hasOpenerItem(): boolean | string {
+		this.ensureConfigFileCreated();
+
 		try {
 			const config = JSON.parse(fs.readFileSync(this.configFilePath, 'utf8'));
 
@@ -34,35 +47,20 @@ class ConfigManager {
 	}
 
 	/**
-	 * 加载配置项
+	 * 确保配置文件已创建
 	 */
-	loadConfigItems(filters: ItemTypes[] = ['files', 'dirs', 'urls']): [string, string][] | string {
-		try {
-			const config = JSON.parse(fs.readFileSync(this.configFilePath, 'utf8'));
-			return  _(config).pick(filters).values().flatten().value() as [string, string][];
-
-		} catch (err) {
-			return err.toString();
+	ensureConfigFileCreated() {
+		if (!validator.isFile(this.configFilePath)) {
+			this.initConfigFile();
 		}
 	}
 
 	/**
-	 * 保存配置项
+	 * 初始化配置文件
 	 */
-	saveConfigItems() {
-
-	}
-
-	/**
-	 * 创建配置文件
-	 */
-	createConfigFile() {
+	initConfigFile() {
 		// Initialize with empty files, dirs and urls
-		fs.writeFileSync(this.configFilePath, JSON.stringify({
-			files: [],
-			dirs: [],
-			urls: [],
-		}, null, '\t'));
+		this.saveOpenerItemMappingToFile({ files: [], dirs: [], urls: [] });
 	}
 
 	/**

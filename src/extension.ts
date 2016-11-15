@@ -4,11 +4,11 @@ import * as controller from './controller';
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('hiveOpener.showOpenList', () => {
-            controller.showOpenList(['files', 'dirs', 'urls']);
+            controller.showOpenerList(['files', 'dirs', 'urls']);
         }),
 
         vscode.commands.registerCommand('hiveOpener.manageOpenList', () => {
-            controller.manageOpenList();
+            controller.manageOpenerList();
         }),
 
         vscode.commands.registerCommand('hiveOpener.openConfigFile', () => {
