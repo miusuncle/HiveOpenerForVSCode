@@ -1,5 +1,3 @@
-import * as paths from 'path';
-import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import * as util from './util';

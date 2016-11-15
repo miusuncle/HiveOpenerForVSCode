@@ -36,7 +36,7 @@ class ConfigManager {
 	/**
 	 * 加载配置项
 	 */
-	loadConfigItems(filters: ItemTypes[] = ['files', 'dirs', 'urls']):[string, string][] | string {
+	loadConfigItems(filters: ItemTypes[] = ['files', 'dirs', 'urls']): [string, string][] | string {
 		try {
 			const config = JSON.parse(fs.readFileSync(this.configFilePath, 'utf8'));
 			return  _(config).pick(filters).values().flatten().value() as [string, string][];
