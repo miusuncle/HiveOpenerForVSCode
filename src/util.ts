@@ -1,7 +1,6 @@
 import * as paths from 'path';
-import * as _ from 'lodash';
 import * as validator from './validator';
-import { OpenerItemList, OpenerItemMapping } from './types';
+import { OpenerItemList, OpenerItemMapping, OpenerItemType } from './types';
 
 export function getItemType(target: string) {
     if (validator.isUrl(target)) {
@@ -20,7 +19,11 @@ export function getItemType(target: string) {
 }
 
 export function convertOpenerItemMappingToOpenerItemList(openerItemMapping: OpenerItemMapping): OpenerItemList {
-    return _(openerItemMapping).values().flatten().value() as OpenerItemList;
+    return [
+        ...openerItemMapping.files || [],
+        ...openerItemMapping.dirs || [],
+        ...openerItemMapping.urls || [],
+    ];
 }
 
 export function convertOpenerItemListToQuickPickItems(openerItemList: OpenerItemList) {
@@ -37,4 +40,17 @@ export function convertOpenerItemListToQuickPickItems(openerItemList: OpenerItem
 
         return { label, description, detail };
     });
+}
+
+export function removeOpenerItemFromOpenerItemMapping(openerItemPath: string, openerItemMapping: OpenerItemMapping) {
+    const openerItemListCollection = [openerItemMapping.files, openerItemMapping.dirs, openerItemMapping.urls];
+
+    for (const openerItemList of openerItemListCollection) {
+        const index = openerItemList.findIndex(([path]) => path === openerItemPath);
+
+        if (index >= 0) {
+            openerItemList.splice(index, 1);
+            return;
+        }
+    }
 }

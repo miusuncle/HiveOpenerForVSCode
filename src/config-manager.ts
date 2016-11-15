@@ -1,6 +1,5 @@
 import * as paths from 'path';
 import * as fs from 'fs';
-import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import * as validator from './validator';
 import { OpenerItemTypeList, OpenerItemMapping } from './types';
@@ -22,8 +21,8 @@ class ConfigManager {
 	/**
 	 * 保存打开配置项
 	 */
-	saveOpenerItemMappingToFile(openerItemMapping: OpenerItemMapping) {
-		fs.writeFileSync(this.configFilePath, JSON.stringify(openerItemMapping, null, '\t'));
+	saveOpenerItemMappingToFile({ files, dirs, urls }: OpenerItemMapping) {
+		fs.writeFileSync(this.configFilePath, JSON.stringify({ files, dirs, urls }, null, '\t'));
 	}
 
 	/**
@@ -33,12 +32,12 @@ class ConfigManager {
 		this.ensureConfigFileCreated();
 
 		try {
-			const config = JSON.parse(fs.readFileSync(this.configFilePath, 'utf8'));
+			const openerItemMapping = JSON.parse(fs.readFileSync(this.configFilePath, 'utf8')) as OpenerItemMapping;
 
 			return (!!(false
-				|| _.get(config, 'files', []).length
-				|| _.get(config, 'dirs', []).length
-				|| _.get(config, 'urls', []).length
+				|| (openerItemMapping.files || []).length
+				|| (openerItemMapping.dirs || []).length
+				|| (openerItemMapping.urls || []).length
 			));
 
 		} catch (err) {

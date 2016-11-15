@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import * as util from './util';
 import * as opener from './opener';
@@ -7,7 +6,7 @@ import getSupportActions from './support-actions';
 import { OpenerItemTypeList, OpenerItemList, OpenerItemMapping } from './types';
 
 /** 显示打开项列表 */
-export function showOpenerList(filters?: OpenerItemTypeList) {
+export async function showOpenerList(filters?: OpenerItemTypeList) {
     const openerItemMapping = configManager.loadOpenerItemMappingFromFile(filters);
 
     if (typeof openerItemMapping === 'string') {
@@ -15,30 +14,27 @@ export function showOpenerList(filters?: OpenerItemTypeList) {
         return;
     }
 
-    // current operating item
-    let target: string;
-
     const openerItemList = util.convertOpenerItemMappingToOpenerItemList(openerItemMapping);
 
-    showQuickPickForOpenerItemList(openerItemList, {
-        placeHolder: 'Please select an item to open',
-    })
-    .then(item => {
-        if (item) {
-            target = item.detail;
-            return opener.open(target);
-        }
-    })
-    .then(result => {
-        if (result === false) {
-            // TODO: remove item from open list
-            console.log('Item to be removed:', target);
-        }
+    const picked = await showQuickPickForOpenerItemList(openerItemList, {
+        placeHolder: 'Please pick an item to open',
     });
+
+    // escaped away
+    if (!picked) {
+        return;
+    }
+
+    const target = picked.detail;
+
+    if (opener.open(target) === false) {
+        // TODO: remove item from open list
+        console.log('Item to be removed:', target);
+    }
 }
 
 /** 管理打开项列表 */
-export function manageOpenerList() {
+export async function manageOpenerList() {
     const actions = getSupportActions();
     const result = configManager.hasOpenerItem();
 
@@ -48,32 +44,36 @@ export function manageOpenerList() {
     }
 
     if (result) {
-        _.each(actions, item => {
-            if (_.includes(['edit', 'remove'], item.type)) {
-                item.active = true;
+        for (const action of actions) {
+            if (['edit', 'remove'].indexOf(action.type) >= 0) {
+                action.active = true;
             }
-        });
+        }
     }
 
-    const quickPickItems = _(actions).filter('active').map('label').value() as string[];
+    const quickPickItems = actions.filter(({ active }) => active).map(({ label }) => label);
+    const picked = await vscode.window.showQuickPick(quickPickItems);
 
-    vscode.window.showQuickPick(quickPickItems).then(label => {
-        const action = _.find(actions, { label });
+    // escaped away
+    if (!picked) {
+        return;
+    }
 
-        switch (action.type) {
-        case 'add':
-            addItemToOpenerList();
-            break;
+    const action = actions.find(({ label }) => label === picked);
 
-        case 'edit':
-            editItemFromOpenerList();
-            break;
+    switch (action.type) {
+    case 'add':
+        addItemToOpenerList();
+        break;
 
-        case 'remove':
-            removeItemFromOpenerList();
-            break;
-        }
-    });
+    case 'edit':
+        editItemFromOpenerList();
+        break;
+
+    case 'remove':
+        removeItemFromOpenerList();
+        break;
+    }
 }
 
 /** 打开配置文件 */
@@ -82,16 +82,43 @@ export function openConfigFile() {
     opener.openFile(configManager.configFilePath);
 }
 
+/** 添加打开配置项 */
 export function addItemToOpenerList() {
     vscode.window.showInformationMessage('TODO: addItemToOpenList');
 }
 
+/** 编辑打开配置项 */
 export function editItemFromOpenerList() {
     vscode.window.showInformationMessage('TODO: editItemFromOpenList');
 }
 
-export function removeItemFromOpenerList() {
-    vscode.window.showInformationMessage('TODO: removeItemFromOpenList');
+/** 移除打开配置项 */
+export async function removeItemFromOpenerList() {
+    const openerItemMapping = configManager.loadOpenerItemMappingFromFile();
+
+    if (typeof openerItemMapping === 'string') {
+        showLoadingFileErrorMessage(openerItemMapping);
+        return;
+    }
+
+    const openerItemList = util.convertOpenerItemMappingToOpenerItemList(openerItemMapping);
+
+    // no opener item exists
+    if (!openerItemList.length) {
+        return;
+    }
+
+    const item = await showQuickPickForOpenerItemList(openerItemList, {
+        placeHolder: 'Please pick an item to remove',
+    });
+
+    if (item) {
+        util.removeOpenerItemFromOpenerItemMapping(item.detail, openerItemMapping);
+        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+        // do repeat remove
+        removeItemFromOpenerList();
+    }
 }
 
 function showQuickPickForOpenerItemList(openerItemList: OpenerItemList, options?: vscode.QuickPickOptions) {
@@ -106,13 +133,13 @@ function showQuickPickForOpenerItemList(openerItemList: OpenerItemList, options?
     return vscode.window.showQuickPick(quickPickItems, quickPickOptions);
 }
 
-function showLoadingFileErrorMessage(err) {
+async function showLoadingFileErrorMessage(err) {
     const message = `Error loading \`${configManager.configFileName}\` file. Message: ${err.toString()}`;
     const items = { title: 'Open File' };
 
-    vscode.window.showErrorMessage(message, items).then(option => {
-        if (option && option.title === 'Open File') {
-            vscode.commands.executeCommand('hiveOpener.openConfigFile');
-        }
-    });
+    const option = await vscode.window.showErrorMessage(message, items);
+
+    if (option && option.title === 'Open File') {
+        vscode.commands.executeCommand('hiveOpener.openConfigFile');
+    }
 }
