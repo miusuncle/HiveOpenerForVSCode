@@ -105,6 +105,7 @@ export async function removeItemFromOpenerList() {
 
     // no opener item exists
     if (!openerItemList.length) {
+        vscode.window.showInformationMessage('There are no entries in open list')
         return;
     }
 
