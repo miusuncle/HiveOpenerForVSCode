@@ -19,6 +19,7 @@
         "link",
         "manage"
     ],
+    "icon": "images/icon.png",
     "license": "MIT",
     "homepage": "https://github.com/miusuncle/HiveOpenerForVSCode",
     "repository": {
