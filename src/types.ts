@@ -11,8 +11,8 @@ export interface OpenerItemMapping {
 }
 
 export interface OpenerEntity {
-    belongTo: OpenerItemCategory,
-    value: OpenerItem,
+    belongTo: OpenerItemCategory;
+    value: OpenerItem;
 }
 
 export interface OpenerEntityInPosition extends OpenerEntity {
