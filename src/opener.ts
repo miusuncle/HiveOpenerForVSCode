@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 const isBinaryFile = require('isbinaryfile');
 
 export function open(target: string) {
-	switch (true) {
+    switch (true) {
     case validator.isUrl(target):
         openUrl(target);
         break;

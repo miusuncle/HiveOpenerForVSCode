@@ -5,16 +5,16 @@ export type OpenerItem = [string, string];
 export type OpenerItemList = OpenerItem[];
 
 export interface OpenerItemMapping {
-	files?: OpenerItemList;
-	dirs?: OpenerItemList;
-	urls?: OpenerItemList;
+    files?: OpenerItemList;
+    dirs?: OpenerItemList;
+    urls?: OpenerItemList;
 }
 
 export interface OpenerEntity {
-	belongTo: OpenerItemCategory,
-	value: OpenerItem,
+    belongTo: OpenerItemCategory,
+    value: OpenerItem,
 }
 
 export interface OpenerEntityInPosition extends OpenerEntity {
-	index: number;
+    index: number;
 }
