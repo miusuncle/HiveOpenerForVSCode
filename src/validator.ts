@@ -3,7 +3,7 @@ import * as validUrl from 'valid-url';
 
 export function isFile(target: string) {
     try {
-        return fs.lstatSync(target).isFile();
+        return fs.statSync(target).isFile();
     } catch (e) {
         return false;
     }
