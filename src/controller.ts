@@ -115,7 +115,7 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
     const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntity, openerItemMapping);
 
     // attempt to add repeating item
-    if (openerEntityInPosition) {
+    if (openerEntityInPosition && (!openerEntityToBeReplaced || openerEntityInPosition.value[1] !== openerEntityToBeReplaced.value[1])) {
         vscode.window.setStatusBarMessage('Same item exists in open list, you can not add it again', 1500);
         addItemToOpenerList(input, openerEntityToBeReplaced);
         return;
