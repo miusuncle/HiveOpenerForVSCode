@@ -135,6 +135,11 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
     }
 
     configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+    if (openerEntityToBeReplaced) {
+        // do repeat edit
+        editItemFromOpenerList();
+    }
 }
 
 /** 编辑打开配置项 */
