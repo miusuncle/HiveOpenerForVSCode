@@ -11,7 +11,7 @@ export function isFile(target: string) {
 
 export function isDirectory(target: string) {
     try {
-        return fs.lstatSync(target).isDirectory();
+        return fs.statSync(target).isDirectory();
     } catch (e) {
         return false;
     }
