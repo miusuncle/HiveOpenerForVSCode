@@ -20,6 +20,10 @@
         "manage"
     ],
     "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#EA4626",
+        "theme": "light"
+    },
     "license": "MIT",
     "homepage": "https://github.com/miusuncle/HiveOpenerForVSCode",
     "repository": {
