@@ -19,7 +19,7 @@
     ],
     "icon": "images/icon.png",
     "galleryBanner": {
-        "color": "#EA4626",
+        "color": "#EFEFEF",
         "theme": "light"
     },
     "license": "MIT",
