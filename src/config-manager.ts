@@ -2,6 +2,7 @@ import * as paths from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as validator from './validator';
+import * as defaultConfigs from './default-configs';
 import { OpenerItemCategoryList, OpenerItemMapping } from './types';
 
 class ConfigManager {
@@ -58,8 +59,15 @@ class ConfigManager {
      * 初始化配置文件
      */
     initConfigFile() {
-        // Initialize with empty files, dirs and urls
-        this.saveOpenerItemMappingToFile({ files: [], dirs: [], urls: [] });
+        let openerItemMapping: OpenerItemMapping;
+
+        if (process.platform === 'win32') {
+            openerItemMapping = defaultConfigs.windows;
+        } else {
+            openerItemMapping = defaultConfigs.defaults;
+        }
+
+        this.saveOpenerItemMappingToFile(openerItemMapping);
     }
 
     /**
