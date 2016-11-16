@@ -2,13 +2,13 @@ import * as paths from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as validator from './validator';
-import { OpenerItemTypeList, OpenerItemMapping } from './types';
+import { OpenerItemCategoryList, OpenerItemMapping } from './types';
 
 class ConfigManager {
 	/**
 	 * 加载打开配置项
 	 */
-	loadOpenerItemMappingFromFile(filters: OpenerItemTypeList = ['files', 'dirs', 'urls']): OpenerItemMapping | string {
+	loadOpenerItemMappingFromFile(filters: OpenerItemCategoryList = ['files', 'dirs', 'urls']): OpenerItemMapping | string {
 		this.ensureConfigFileCreated();
 
 		try {

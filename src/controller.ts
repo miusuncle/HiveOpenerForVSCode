@@ -3,10 +3,10 @@ import * as util from './util';
 import * as opener from './opener';
 import configManager from './config-manager';
 import getSupportActions from './support-actions';
-import { OpenerItemTypeList, OpenerItemList, OpenerItemMapping } from './types';
+import { OpenerItemCategoryList, OpenerItemList, OpenerItemMapping, OpenerEntity, OpenerEntityInPosition } from './types';
 
 /** 显示打开项列表 */
-export async function showOpenerList(filters?: OpenerItemTypeList) {
+export async function showOpenerList(filters?: OpenerItemCategoryList) {
     const openerItemMapping = configManager.loadOpenerItemMappingFromFile(filters);
 
     if (typeof openerItemMapping === 'string') {
@@ -87,13 +87,90 @@ export function openConfigFile() {
 }
 
 /** 添加打开配置项 */
-export function addItemToOpenerList() {
-    vscode.window.showInformationMessage('TODO: addItemToOpenList');
+export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?: OpenerEntityInPosition) {
+    const openerItemMapping = configManager.loadOpenerItemMappingFromFile();
+
+    if (typeof openerItemMapping === 'string') {
+        showLoadingFileErrorMessage(openerItemMapping);
+        return;
+    }
+
+    const placeHolder = 'Please enter a file, directory or url path, and separated it by `|` with an optional description';
+    const input = await showInputBox({ value, placeHolder });
+
+    // escaped away
+    if (input === undefined) {
+        return;
+    }
+
+    const openerEntity = util.parseOpenerEntityFromUserInput(input);
+
+    // input is invalid
+    if (!openerEntity) {
+        vscode.window.setStatusBarMessage(placeHolder, 1500);
+        addItemToOpenerList(input, openerEntityToBeReplaced);
+        return;
+    }
+
+    const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntity, openerItemMapping);
+
+    // attempt to add repeating item
+    if (openerEntityInPosition) {
+        vscode.window.setStatusBarMessage('Same item exists in open list, you can not add it again', 1500);
+        addItemToOpenerList(input, openerEntityToBeReplaced);
+        return;
+    }
+
+    if (openerEntityToBeReplaced) {
+        if (openerEntityToBeReplaced.belongTo === openerEntity.belongTo) {
+            const index = openerEntityToBeReplaced.index;
+            util.replaceOpenerEntityInOpenerItemMapping(index, openerEntity, openerItemMapping);
+        } else {
+            util.removeOpenerEntityFromOpenerItemMapping(openerEntityToBeReplaced, openerItemMapping);
+            util.addOpenerEntityToOpenerItemMapping(openerEntity, openerItemMapping);
+        }
+
+    } else {
+        util.addOpenerEntityToOpenerItemMapping(openerEntity, openerItemMapping);
+    }
+
+    configManager.saveOpenerItemMappingToFile(openerItemMapping);
 }
 
 /** 编辑打开配置项 */
-export function editItemFromOpenerList() {
-    vscode.window.showInformationMessage('TODO: editItemFromOpenList');
+export async function editItemFromOpenerList() {
+    const openerItemMapping = configManager.loadOpenerItemMappingFromFile();
+
+    if (typeof openerItemMapping === 'string') {
+        showLoadingFileErrorMessage(openerItemMapping);
+        return;
+    }
+
+    const openerItemList = util.convertOpenerItemMappingToOpenerItemList(openerItemMapping);
+
+    // no opener item exists
+    if (!openerItemList.length) {
+        vscode.window.showInformationMessage('There are no entries in open list');
+        return;
+    }
+
+    const picked = await showQuickPickForOpenerItemList(openerItemList, {
+        placeHolder: 'Please pick an item to edit',
+    });
+
+    // escaped away
+    if (!picked) {
+        return;
+    }
+
+    const openerEntityToBeReplaced = util.findOpenerEntityFromOpenerItemMapping({
+        belongTo: util.getItemCategory(picked.detail),
+        value: [picked.detail, picked.label],
+    }, openerItemMapping);
+
+    const value = openerEntityToBeReplaced.value;
+    const inputValue = value[1] ? value.join(' | ') : value[0];
+    addItemToOpenerList(inputValue, openerEntityToBeReplaced);
 }
 
 /** 移除打开配置项 */
@@ -109,16 +186,23 @@ export async function removeItemFromOpenerList() {
 
     // no opener item exists
     if (!openerItemList.length) {
-        vscode.window.showInformationMessage('There are no entries in open list')
+        vscode.window.showInformationMessage('There are no entries in open list');
         return;
     }
 
-    const item = await showQuickPickForOpenerItemList(openerItemList, {
+    const picked = await showQuickPickForOpenerItemList(openerItemList, {
         placeHolder: 'Please pick an item to remove',
     });
 
-    if (item) {
-        util.removeOpenerItemFromOpenerItemMapping(item.detail, openerItemMapping);
+    if (picked) {
+        const openerEntityToBeRemoved: OpenerEntity = {
+            belongTo: util.getItemCategory(picked.detail),
+            value: [picked.detail, ''],
+        };
+
+        const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntityToBeRemoved, openerItemMapping);
+        util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
+
         configManager.saveOpenerItemMappingToFile(openerItemMapping);
 
         // do repeat remove
@@ -136,6 +220,14 @@ function showQuickPickForOpenerItemList(openerItemList: OpenerItemList, options?
     }, options) as vscode.QuickPickOptions;
 
     return vscode.window.showQuickPick(quickPickItems, quickPickOptions);
+}
+
+function showInputBox(options?: vscode.InputBoxOptions) {
+    const inputBoxOptions = Object.assign({
+        ignoreFocusOut: true,
+    }, options) as vscode.InputBoxOptions;
+
+    return vscode.window.showInputBox(inputBoxOptions);
 }
 
 async function showLoadingFileErrorMessage(err) {
