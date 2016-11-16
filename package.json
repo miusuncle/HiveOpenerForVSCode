@@ -10,6 +10,24 @@
     "categories": [
         "Other"
     ],
+    "keywords": [
+        "open",
+        "file",
+        "directory",
+        "folder",
+        "url",
+        "link",
+        "manage"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/miusuncle/HiveOpenerForVSCode",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/miusuncle/HiveOpenerForVSCode.git"
+    },
+    "bugs": {
+        "url": "https://github.com/miusuncle/HiveOpenerForVSCode/issues"
+    },
     "activationEvents": [
         "onCommand:hiveOpener.showOpenerList",
         "onCommand:hiveOpener.manageOpenerList",
