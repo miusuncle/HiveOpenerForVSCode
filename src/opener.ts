@@ -6,6 +6,10 @@ const isBinaryFile = require('isbinaryfile');
 
 export function open(target: string) {
     switch (true) {
+    case validator.isApp(target):
+        openApp(target);
+        break;
+
     case validator.isUrl(target):
         openUrl(target);
         break;
@@ -23,9 +27,19 @@ export function open(target: string) {
     }
 }
 
+export function openApp(target: string) {
+    childProcess.exec(`open "${target}"`);
+}
+
 export function openFile(target: string) {
     if (isBinaryFile.sync(target)) {
-        childProcess.exec(`explorer "${target}"`);
+        if (validator.win()) {
+            childProcess.exec(`explorer "${target}"`);
+        }
+
+        if (validator.mac()) {
+            childProcess.exec(`open "${target}"`);
+        }
 
     } else {
         vscode.workspace.openTextDocument(target).then(doc => {
@@ -37,7 +51,13 @@ export function openFile(target: string) {
 }
 
 export function openDirectory(target: string) {
-    childProcess.exec(`start "" "${target}"`);
+    if (validator.win()) {
+        childProcess.exec(`start "" "${target}"`);
+    }
+
+    if (validator.mac()) {
+        childProcess.exec(`open "${target}"`);
+    }
 }
 
 export function openUrl(target: string) {

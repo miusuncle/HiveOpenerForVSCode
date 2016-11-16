@@ -26,13 +26,13 @@ Press `F1` in VSCode, type `ext install` and then look for `Hive Opener`.
 
 ## Preset keybindings
 
-- Press `alt + ctrl + o` to show open list
-- Press `alt + ctrl + i` to manage open list
+- Press `alt + ctrl + o (win)` or `cmd + ctrl + o (mac)` to show open list
+- Press `alt + ctrl + i (win)` or `cmd + ctrl + i (mac)` to manage open list
 - Press `alt + shift + i` to open config file
 
 # Known Issues
 
-At this point, the extension only work under Windows, supporting for Mac will coming soon.
+At this point, the extension only work under Windows and Mac, supporting for Linux is to be determined.
 
 # License
 

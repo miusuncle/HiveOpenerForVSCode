@@ -86,11 +86,13 @@
     "keybindings": [
       {
         "command": "hiveOpener.showOpenerList",
-        "key": "alt+ctrl+o"
+        "key": "alt+ctrl+o",
+        "mac": "cmd+ctrl+o"
       },
       {
         "command": "hiveOpener.manageOpenerList",
-        "key": "alt+ctrl+i"
+        "key": "alt+ctrl+i",
+        "mac": "cmd+ctrl+i"
       },
       {
         "command": "hiveOpener.openConfigFile",

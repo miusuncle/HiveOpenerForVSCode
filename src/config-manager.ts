@@ -61,8 +61,10 @@ class ConfigManager {
     initConfigFile() {
         let openerItemMapping: OpenerItemMapping;
 
-        if (process.platform === 'win32') {
-            openerItemMapping = defaultConfigs.windows;
+        if (validator.win()) {
+            openerItemMapping = defaultConfigs.win;
+        } else if (validator.mac()) {
+            openerItemMapping = defaultConfigs.mac;
         } else {
             openerItemMapping = defaultConfigs.defaults;
         }
@@ -80,7 +82,16 @@ class ConfigManager {
             return paths.join(configFileLocation, this.configFileName);
 
         } else {
-            const appData = process.env.APPDATA;
+            let appData = '';
+
+            if (validator.win()) {
+                appData = process.env.APPDATA;
+            } else if (validator.mac()) {
+                appData = process.env.HOME + '/Library/Application Support';
+            } else {
+                appData = '/var/local';
+            }
+
             return paths.join(appData, this._channelPath, 'User', this.configFileName);
         }
     }

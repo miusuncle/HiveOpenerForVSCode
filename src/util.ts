@@ -7,6 +7,10 @@ export function getItemType(target: string) {
         return 'URL';
     }
 
+    if (validator.isApp(target)) {
+        return 'APP';
+    }
+
     if (validator.isDirectory(target)) {
         return 'DIR';
     }
@@ -19,6 +23,10 @@ export function getItemType(target: string) {
 }
 
 export function getItemCategory(target: string): OpenerItemCategory {
+    if (validator.isApp(target)) {
+        return 'files';
+    }
+
     if (validator.isUrl(target)) {
         return 'urls';
     }
