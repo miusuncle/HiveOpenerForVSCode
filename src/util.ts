@@ -2,7 +2,12 @@ import * as paths from 'path';
 import * as validator from './validator';
 import { OpenerItem, OpenerItemList, OpenerItemMapping, OpenerItemCategory, OpenerEntity, OpenerEntityInPosition } from './types';
 
+import * as os from 'os';
+const HOME_DIR = os.homedir();
+
 export function getItemType(target: string) {
+    target = replaceTidleWithHomeDir(target);
+
     if (validator.isUrl(target)) {
         return 'URL';
     }
@@ -23,6 +28,8 @@ export function getItemType(target: string) {
 }
 
 export function getItemCategory(target: string): OpenerItemCategory {
+    target = replaceTidleWithHomeDir(target);
+
     if (validator.isApp(target)) {
         return 'files';
     }
@@ -129,4 +136,8 @@ export function parseOpenerEntityFromUserInput(target: string): OpenerEntity {
 
 export function stripQuotesAndWhiteSpaces(target: string) {
     return target.replace(/^["'\s]+/g, '').replace(/["'\s]+$/g, '');
+}
+
+export function replaceTidleWithHomeDir(target: string) {
+    return target.replace(/^~/, HOME_DIR);
 }

@@ -28,12 +28,20 @@ export const mac: OpenerItemMapping = {
         [
             '/etc/hosts',
             'hosts_file'
+        ],
+        [
+            '/Applications/Calculator.app',
+            'calc'
         ]
     ],
     dirs: [
         [
-            '/etc',
-            'hosts_dir'
+            '~',
+            'home'
+        ],
+        [
+            '~/Desktop',
+            'desktop'
         ]
     ],
     urls: [

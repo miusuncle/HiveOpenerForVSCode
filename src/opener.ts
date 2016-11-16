@@ -1,10 +1,13 @@
 import * as childProcess from 'child_process';
 import * as validator from './validator';
+import * as util from './util';
 import * as vscode from 'vscode';
 
 const isBinaryFile = require('isbinaryfile');
 
 export function open(target: string) {
+    target = util.replaceTidleWithHomeDir(target);
+
     switch (true) {
     case validator.isApp(target):
         openApp(target);
