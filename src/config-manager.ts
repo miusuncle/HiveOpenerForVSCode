@@ -84,17 +84,17 @@ class ConfigManager {
             return paths.join(configFileLocation, this.configFileName);
 
         } else {
-            let appData = '';
+            let appDataPath = '';
 
             if (validator.win()) {
-                appData = process.env.APPDATA;
+                appDataPath = process.env.APPDATA;
             } else if (validator.mac()) {
-                appData = process.env.HOME + '/Library/Application Support';
+                appDataPath = process.env.HOME + '/Library/Application Support';
             } else {
-                appData = '/var/local';
+                appDataPath = '/var/local';
             }
 
-            return paths.join(appData, this._channelPath, 'User', this.configFileName);
+            return paths.join(appDataPath, this._channelPath, 'User', this.configFileName);
         }
     }
 
