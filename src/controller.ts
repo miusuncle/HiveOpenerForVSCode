@@ -138,8 +138,14 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
     configManager.saveOpenerItemMappingToFile(openerItemMapping);
 
     if (openerEntityToBeReplaced) {
+        vscode.window.setStatusBarMessage(`Item has been updated successfully`, 3000);
+
         // do repeat edit
         editItemFromOpenerList();
+    } else {
+        const itemPath = openerEntity.value[0];
+        const category = openerEntity.belongTo;
+        vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been added to "${category}" successfully`, 3000);
     }
 }
 
@@ -213,6 +219,10 @@ export async function removeItemFromOpenerList() {
 
         // do repeat remove
         removeItemFromOpenerList();
+
+        const itemPath = openerEntityInPosition.value[0];
+        const category = openerEntityInPosition.belongTo;
+        vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been removed from "${category}" successfully`, 3000);
     }
 }
 
