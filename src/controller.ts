@@ -26,22 +26,16 @@ export async function showOpenerList(filters?: OpenerItemCategoryList) {
     }
 
     const target = picked.detail;
+    const belongTo = util.getItemCategory(target);
 
-    if (opener.open(target) === false) {
-        const message = `Unrecognized item: \`${target}\`, drop it anyway?`;
-        const items = { title: 'Yes' };
-
-        // show drop message
-        const option = await vscode.window.showWarningMessage(message, items);
-
-        if (option && option.title === 'Yes') {
-            // remove item from open list
-            util.removeOpenerItemFromOpenerItemMapping(target, openerItemMapping);
-            configManager.saveOpenerItemMappingToFile(openerItemMapping);
-
-            vscode.window.setStatusBarMessage(`Item \`${target}\` has been dropped successfully`, 3000);
-        }
+    // unrecognized item
+    if (!belongTo) {
+        // confirm to drop it from open list
+        showDropUnrecognizedItemConfirmBar(target, openerItemMapping);
+        return;
     }
+
+    opener.open(target);
 }
 
 /** 管理打开项列表 */
@@ -115,7 +109,7 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
 
     // input is invalid
     if (!openerEntity) {
-        vscode.window.setStatusBarMessage(placeHolder, 1500);
+        vscode.window.setStatusBarMessage(placeHolder, 2000);
         addItemToOpenerList(input, openerEntityToBeReplaced);
         return;
     }
@@ -124,7 +118,7 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
 
     // attempt to add repeating item
     if (openerEntityInPosition && (!openerEntityToBeReplaced || openerEntityInPosition.value[1] !== openerEntityToBeReplaced.value[1])) {
-        vscode.window.setStatusBarMessage('Same item exists in open list, you can not add it again', 1500);
+        vscode.window.setStatusBarMessage('Same item exists in open list, you can not add it again', 2000);
         addItemToOpenerList(input, openerEntityToBeReplaced);
         return;
     }
@@ -187,7 +181,8 @@ export async function editItemFromOpenerList() {
 
     // unrecognized item
     if (!belongTo) {
-        confirmDropUnrecognizedItem(target, openerItemMapping);
+        // confirm to drop it from open list
+        showDropUnrecognizedItemConfirmBar(target, openerItemMapping);
         return;
     }
 
@@ -223,28 +218,31 @@ export async function removeItemFromOpenerList() {
     });
 
     if (picked) {
-        const openerEntityToBeRemoved: OpenerEntity = {
-            belongTo: util.getItemCategory(picked.detail),
-            value: [picked.detail, ''],
-        };
+        const belongTo = util.getItemCategory(picked.detail);
 
-        if (!openerEntityToBeRemoved.belongTo) {
+        // unrecognized item
+        if (!belongTo) {
             // remove unknown item from open list
             util.removeOpenerItemFromOpenerItemMapping(picked.detail, openerItemMapping);
             configManager.saveOpenerItemMappingToFile(openerItemMapping);
 
             vscode.window.setStatusBarMessage(`Item \`${picked.detail}\` has been dropped successfully`, 3000);
-
-        } else {
-            const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntityToBeRemoved, openerItemMapping);
-            util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
-
-            configManager.saveOpenerItemMappingToFile(openerItemMapping);
-
-            const itemPath = openerEntityInPosition.value[0];
-            const category = openerEntityInPosition.belongTo;
-            vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been removed from "${category}" successfully`, 3000);
+            return;
         }
+
+        const openerEntityToBeRemoved: OpenerEntity = {
+            belongTo,
+            value: [picked.detail, ''],
+        };
+
+        const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntityToBeRemoved, openerItemMapping);
+        util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
+
+        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+        const itemPath = openerEntityInPosition.value[0];
+        const category = openerEntityInPosition.belongTo;
+        vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been removed from "${category}" successfully`, 3000);
 
         // do repeat remove
         removeItemFromOpenerList();
@@ -282,7 +280,7 @@ async function showLoadingFileErrorMessage(err) {
     }
 }
 
-async function confirmDropUnrecognizedItem(target: string, openerItemMapping: OpenerItemMapping) {
+async function showDropUnrecognizedItemConfirmBar(target: string, openerItemMapping: OpenerItemMapping) {
     const message = `Unrecognized item: \`${target}\`, drop it anyway?`;
     const items = { title: 'Yes' };
 

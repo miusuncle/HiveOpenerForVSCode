@@ -26,7 +26,8 @@ export function open(target: string) {
         break;
 
     default:
-        return false;
+        vscode.window.showErrorMessage(`Oops! item \`${target}\` can not be opened`);
+        break;
     }
 }
 
