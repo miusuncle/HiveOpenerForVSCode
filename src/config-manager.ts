@@ -1,6 +1,7 @@
 import * as paths from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
+import * as util from './util';
 import * as validator from './validator';
 import * as defaultConfigs from './default-configs';
 import { OpenerItemCategoryList, OpenerItemMapping } from './types';
@@ -76,9 +77,10 @@ class ConfigManager {
      * 获取配置文件路径
      */
     get configFilePath() {
-        const configFileLocation = vscode.workspace.getConfiguration('hiveOpener').get('configFileLocation');
+        let configFileLocation = <string>vscode.workspace.getConfiguration('hiveOpener').get('configFileLocation');
 
         if (configFileLocation !== '') {
+            configFileLocation = util.replaceTidleWithHomeDir(configFileLocation);
             return paths.join(configFileLocation, this.configFileName);
 
         } else {
