@@ -219,17 +219,26 @@ export async function removeItemFromOpenerList() {
             value: [picked.detail, ''],
         };
 
-        const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntityToBeRemoved, openerItemMapping);
-        util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
+        if (!openerEntityToBeRemoved.belongTo) {
+            // remove unknown item from open list
+            util.removeOpenerItemFromOpenerItemMapping(picked.detail, openerItemMapping);
+            configManager.saveOpenerItemMappingToFile(openerItemMapping);
 
-        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+            vscode.window.setStatusBarMessage(`Item \`${picked.detail}\` has been dropped successfully`, 3000);
+
+        } else {
+            const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping(openerEntityToBeRemoved, openerItemMapping);
+            util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
+
+            configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+            const itemPath = openerEntityInPosition.value[0];
+            const category = openerEntityInPosition.belongTo;
+            vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been removed from "${category}" successfully`, 3000);
+        }
 
         // do repeat remove
         removeItemFromOpenerList();
-
-        const itemPath = openerEntityInPosition.value[0];
-        const category = openerEntityInPosition.belongTo;
-        vscode.window.setStatusBarMessage(`Item \`${itemPath}\` has been removed from "${category}" successfully`, 3000);
     }
 }
 
