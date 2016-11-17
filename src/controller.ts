@@ -182,8 +182,17 @@ export async function editItemFromOpenerList() {
         return;
     }
 
+    const target = picked.detail;
+    const belongTo = util.getItemCategory(target);
+
+    // unrecognized item
+    if (!belongTo) {
+        confirmDropUnrecognizedItem(target, openerItemMapping);
+        return;
+    }
+
     const openerEntityToBeReplaced = util.findOpenerEntityFromOpenerItemMapping({
-        belongTo: util.getItemCategory(picked.detail),
+        belongTo,
         value: [picked.detail, picked.label],
     }, openerItemMapping);
 
@@ -270,5 +279,21 @@ async function showLoadingFileErrorMessage(err) {
 
     if (option && option.title === 'Open File') {
         vscode.commands.executeCommand('hiveOpener.openConfigFile');
+    }
+}
+
+async function confirmDropUnrecognizedItem(target: string, openerItemMapping: OpenerItemMapping) {
+    const message = `Unrecognized item: \`${target}\`, drop it anyway?`;
+    const items = { title: 'Yes' };
+
+    // show drop message
+    const option = await vscode.window.showWarningMessage(message, items);
+
+    if (option && option.title === 'Yes') {
+        // remove item from open list
+        util.removeOpenerItemFromOpenerItemMapping(target, openerItemMapping);
+        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+        vscode.window.setStatusBarMessage(`Item \`${target}\` has been dropped successfully`, 3000);
     }
 }
