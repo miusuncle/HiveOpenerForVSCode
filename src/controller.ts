@@ -28,12 +28,19 @@ export async function showOpenerList(filters?: OpenerItemCategoryList) {
     const target = picked.detail;
 
     if (opener.open(target) === false) {
-        // remove item from open list
-        util.removeOpenerItemFromOpenerItemMapping(target, openerItemMapping);
-        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+        const message = `Unrecognized item: \`${target}\`, drop it anyway?`;
+        const items = { title: 'Yes' };
 
         // show drop message
-        vscode.window.showWarningMessage(`Unrecognized item: \`${target}\`, drop it anyway from config file!`);
+        const option = await vscode.window.showWarningMessage(message, items);
+
+        if (option && option.title === 'Yes') {
+            // remove item from open list
+            util.removeOpenerItemFromOpenerItemMapping(target, openerItemMapping);
+            configManager.saveOpenerItemMappingToFile(openerItemMapping);
+
+            vscode.window.setStatusBarMessage(`Item \`${target}\` has been dropped successfully`, 3000);
+        }
     }
 }
 
