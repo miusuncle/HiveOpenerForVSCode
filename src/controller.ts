@@ -103,7 +103,8 @@ export async function addItemToOpenerList(value = '', openerEntityToBeReplaced?:
         return;
     }
 
-    const openerEntity = util.parseOpenerEntityFromUserInput(input);
+    // replace tidle(~) with home folder when in `add` mode
+    const openerEntity = util.parseOpenerEntityFromUserInput(input, !openerEntityToBeReplaced);
 
     // input is invalid
     if (!openerEntity) {

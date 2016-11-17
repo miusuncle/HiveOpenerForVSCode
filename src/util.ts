@@ -122,15 +122,19 @@ export function removeOpenerItemFromOpenerItemMapping(openerItemPath: string, op
     }
 }
 
-export function parseOpenerEntityFromUserInput(target: string): OpenerEntity {
+export function parseOpenerEntityFromUserInput(target: string, replaceTidle = false): OpenerEntity {
     const [rawPath, ...remain] = target.split('|');
 
-    const path = stripQuotesAndWhiteSpaces(rawPath);
+    let realPath = stripQuotesAndWhiteSpaces(rawPath);
+    if (replaceTidle) {
+        realPath = replaceTidleWithHomeDir(realPath);
+    }
+
     const description = stripQuotesAndWhiteSpaces(remain.join('|'));
 
-    const itemCategory = getItemCategory(path);
+    const itemCategory = getItemCategory(realPath);
     if (itemCategory) {
-        return { belongTo: itemCategory, value: [path, description] };
+        return { belongTo: itemCategory, value: [realPath, description] };
     }
 }
 
