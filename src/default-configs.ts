@@ -7,12 +7,20 @@ export const win: OpenerItemMapping = {
         [
             'C:\\Windows\\System32\\drivers\\etc\\hosts',
             'hosts_file'
+        ],
+        [
+            'C:\\Windows\\System32\\calc.exe',
+            'calc'
         ]
     ],
     dirs: [
         [
-            'C:\\Windows\\System32\\drivers\\etc',
-            'hosts_dir'
+            '~',
+            'home'
+        ],
+        [
+            '~\\Desktop',
+            'desktop'
         ]
     ],
     urls: [
