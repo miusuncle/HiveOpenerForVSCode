@@ -57,7 +57,9 @@ export async function manageOpenerList() {
     }
 
     const quickPickItems = actions.filter(({ active }) => active).map(({ label }) => label);
-    const picked = await vscode.window.showQuickPick(quickPickItems);
+    const picked = await vscode.window.showQuickPick(quickPickItems, {
+        placeHolder: 'Please pick an action',
+    });
 
     // escaped away
     if (!picked) {
