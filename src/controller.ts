@@ -35,7 +35,23 @@ export async function showOpenerList(filters?: OpenerItemCategoryList) {
         return;
     }
 
-    opener.open(target);
+    // `false` means item cannot be opened, but it almost never happen
+    if (opener.open(target) === false) {
+        return;
+    }
+
+    const nearestOpenedItemComesFirst = <boolean>vscode.workspace.getConfiguration('hiveOpener').get('nearestOpenedItemComesFirst');
+    if (nearestOpenedItemComesFirst) {
+        const openerEntityInPosition = util.findOpenerEntityFromOpenerItemMapping({
+            belongTo,
+            value: [picked.detail, picked.label],
+        }, openerItemMapping);
+
+        util.removeOpenerEntityFromOpenerItemMapping(openerEntityInPosition, openerItemMapping);
+        util.addOpenerEntityToOpenerItemMapping(openerEntityInPosition, openerItemMapping, false);
+
+        configManager.saveOpenerItemMappingToFile(openerItemMapping);
+    }
 }
 
 /** 管理打开项列表 */

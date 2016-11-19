@@ -86,13 +86,17 @@ export function findOpenerEntityFromOpenerItemMapping(openerEntity: OpenerEntity
     }
 }
 
-export function addOpenerEntityToOpenerItemMapping(openerEntity: OpenerEntity, openerItemMapping: OpenerItemMapping) {
+export function addOpenerEntityToOpenerItemMapping(openerEntity: OpenerEntity, openerItemMapping: OpenerItemMapping, append = true) {
     let openerItemList = openerItemMapping[openerEntity.belongTo] as OpenerItemList;
     if (!openerItemList) {
         openerItemMapping[openerEntity.belongTo] = openerItemList = [];
     }
 
-    openerItemList.push(openerEntity.value);
+    if (append) {
+        openerItemList.push(openerEntity.value);
+    } else {
+        openerItemList.unshift(openerEntity.value);
+    }
 }
 
 export function replaceOpenerEntityInOpenerItemMapping(index: number, openerEntity: OpenerEntity, openerItemMapping: OpenerItemMapping) {

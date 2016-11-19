@@ -23,6 +23,7 @@ Press `F1` in VSCode, type `ext install` and then look for `Hive Opener`.
 
 - `hiveOpener.configFileName` Indicates an alternative config file name. The default config file name is `hive-opener.json`
 - `hiveOpener.configFileLocation` Indicates an alternative location where the `hive-opener.json` file is stored
+- `hiveOpener.nearestOpenedItemComesFirst` Nearest opened item shown before others which are belonged to the same category in open list, default to `true`.
 
 ## Preset keybindings
 

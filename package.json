@@ -80,6 +80,11 @@
           "type": "string",
           "default": "",
           "description": "Indicates an alternative location where the `hive-opener.json` file is stored"
+        },
+        "hiveOpener.nearestOpenedItemComesFirst": {
+          "type": "boolean",
+          "default": true,
+          "description": "Nearest opened item shown before others which are belonged to the same category in open list"
         }
       }
     },
