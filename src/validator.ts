@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as paths from 'path';
 import * as validUrl from 'valid-url';
+import * as platform from './platform';
 
 export function isFile(target: string) {
     try {
@@ -23,12 +24,9 @@ export function isUrl(target: string) {
 }
 
 export function isApp(target: string) {
-    if (!mac()) {
+    if (!platform.mac) {
         return false;
     }
 
     return paths.extname(target).toLowerCase() === '.app';
 }
-
-export const win = () => process.platform === 'win32';
-export const mac = () => process.platform === 'darwin';

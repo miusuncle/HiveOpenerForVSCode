@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as validator from './validator';
+import * as platform from './platform';
 import * as util from './util';
 import * as vscode from 'vscode';
 
@@ -37,11 +38,11 @@ export function openApp(target: string) {
 
 export function openFile(target: string) {
     if (isBinaryFile.sync(target)) {
-        if (validator.win()) {
+        if (platform.win) {
             childProcess.exec(`explorer "${target}"`);
         }
 
-        if (validator.mac()) {
+        if (platform.mac) {
             childProcess.exec(`open "${target}"`);
         }
 
@@ -55,11 +56,11 @@ export function openFile(target: string) {
 }
 
 export function openDirectory(target: string) {
-    if (validator.win()) {
+    if (platform.win) {
         childProcess.exec(`start "" "${target}"`);
     }
 
-    if (validator.mac()) {
+    if (platform.mac) {
         childProcess.exec(`open "${target}"`);
     }
 }

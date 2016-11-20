@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as util from './util';
 import * as validator from './validator';
+import * as platform from './platform';
 import * as defaultConfigs from './default-configs';
 import { OpenerItemCategoryList, OpenerItemMapping } from './types';
 
@@ -62,9 +63,9 @@ class ConfigManager {
     initConfigFile() {
         let openerItemMapping: OpenerItemMapping;
 
-        if (validator.win()) {
+        if (platform.win) {
             openerItemMapping = defaultConfigs.win;
-        } else if (validator.mac()) {
+        } else if (platform.mac) {
             openerItemMapping = defaultConfigs.mac;
         } else {
             openerItemMapping = defaultConfigs.defaults;
@@ -86,9 +87,9 @@ class ConfigManager {
         } else {
             let appDataPath = '';
 
-            if (validator.win()) {
+            if (platform.win) {
                 appDataPath = process.env.APPDATA;
-            } else if (validator.mac()) {
+            } else if (platform.mac) {
                 appDataPath = process.env.HOME + '/Library/Application Support';
             } else {
                 appDataPath = '/var/local';
