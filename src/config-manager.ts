@@ -25,7 +25,7 @@ class ConfigManager {
      * 保存打开配置项
      */
     saveOpenerItemMappingToFile({ files, dirs, urls }: OpenerItemMapping) {
-        fs.writeFileSync(this.configFilePath, JSON.stringify({ files, dirs, urls }, null, '\t'));
+        fs.writeFileSync(this.configFilePath, JSON.stringify({ files, dirs, urls }, null, 4));
     }
 
     /**
